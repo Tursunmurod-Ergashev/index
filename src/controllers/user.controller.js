@@ -1,7 +1,5 @@
 const userService = require('../services/user.services')
 const jwt = require('jsonwebtoken');
-const {ValidationError} = require('yup');
-const {registerUserSchema} = require('../validations/user.validation')
 const secret_key = process.env.TOKEN_SECRET;
 class userController {
     async getAllUserController(req, res) {
@@ -15,15 +13,11 @@ class userController {
     async postUserController(req, res) {
         try {
             const { body } = req;
-            const data = registerUserSchema.validateSync(body, { abortEarly: false, stripUnknown: true })
-
-            
-
-            // const data = await userService.postUserService({ last_name, password, phone, first_name, email });
+            const data = await userService.postUserService(body);
             return res.json(data)
         } catch (er) { 
-            const error =  ValidationError;
-             return res.json(error)
+            // const error =  ValidationError;
+             return res.json(err)
         }
     }
     async getByIdUserController(req, res) {

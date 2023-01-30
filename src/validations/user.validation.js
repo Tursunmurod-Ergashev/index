@@ -1,12 +1,27 @@
 const yup = require('yup') 
-  const PASSWORD_REGEX = /^[a-zA-Z0-9]{8,}$/;
+
   const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
-  export const registerUserSchema = yup
-    .object({
-      last_name: yup.string().optional().trim(),
-      email: yup.string().required().email(),
-      first_name: yup.string().trim().min(2).max(50),
-      password: yup.string().matches(PASSWORD_REGEX, 'password must contain only letters and numbers with a minimum of 8 characters'),
-      phone: yup.phone().matches(phoneRegExp, 'plase this phone number input')
-    })
-    .required();
+
+const linkSchema = yup.object({
+  body: yup.object({
+    last_name: yup.string().url().required(),
+    email: yup.string().required().email().required(),
+    first_name: yup.string().required(),
+    password: yup.string().required(),
+    phone: yup.string().matches(phoneRegExp, 'plase this phone number input')
+  }),
+ 
+});
+const validate = (schema) => async (req, res, next) => {
+  try {
+    await schema.validate({
+      body: req.body,
+      query: req.query,
+      params: req.params,
+    });
+    return next();
+  } catch (err) {
+    return res.status(500).json({ type: err.name, message: err.message });
+  }
+};
+module.exports = validate(linkSchema)
